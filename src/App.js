@@ -15,34 +15,29 @@ import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 function App() {
   const [result, setResult] = useState([]);
   const [book, setBook] = useState("");
-
-  function handleChange(event) {
-    const book = event.target.value;
-    setBook(book);
-  }
+  const url = "https://www.googleapis.com/books/v1/volumes";
+  const key = "AIzaSyD2MwD49Qj5xQ4_VFiBh3KD3llkWvQzeDw&maxResults=40";
 
   function handleKeyPress(event) {
     event.preventDefault();
     axios
-      .get(
-        "https://www.googleapis.com/books/v1/volumes?q=" +
-          book +
-          "&key=AIzaSyD2MwD49Qj5xQ4_VFiBh3KD3llkWvQzeDw&maxResults=40"
-      )
+      .get(`${url}?q=${book}&key=${key}`)
       .then((data) => {
-        console.log(data.data.items);
         setResult(data.data.items);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
   useEffect(() => {
     axios
-      .get(
-        "https://www.googleapis.com/books/v1/volumes?q=fiction&key=AIzaSyD2MwD49Qj5xQ4_VFiBh3KD3llkWvQzeDw&maxResults=40"
-      )
+      .get(`${url}?q=fiction&key=${key}&maxResults=40`)
       .then((data) => {
-        console.log(data.data.items);
         setResult(data.data.items);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }, []);
 
@@ -56,7 +51,7 @@ function App() {
         <input
           type="text"
           placeholder="Type here to search for books..."
-          onChange={handleChange}
+          onChange={(e) => setBook(e.target.value)}
         />
         <SearchIcon className="searchIcon" onClick={handleKeyPress} />
       </div>
@@ -67,28 +62,23 @@ function App() {
             <Card className="card" key={book.id}>
               <img
                 alt="Sample"
-                src={
-                  book.volumeInfo.imageLinks !== undefined
-                    ? book.volumeInfo.imageLinks.thumbnail
-                    : ""
-                }
+                src={book?.volumeInfo?.imageLinks?.thumbnail}
                 className="cardImage"
               />
               <CardBody className="cardBody">
                 <CardTitle className="cardTitle" tag="h4">
-                  {book.volumeInfo.title !== undefined
-                    ? book.volumeInfo.title.substring(0, 15) + "..."
-                    : ""}
+                  {book?.volumeInfo?.title?.substring(0, 15) + "..."}
                 </CardTitle>
                 <CardSubtitle className="cardSubtitle" tag="h5">
-                  {book.volumeInfo.printType}
+                  {book?.volumeInfo?.printType}
                 </CardSubtitle>
                 <CardText>
-                  {book.volumeInfo.description !== undefined
-                    ? book.volumeInfo.description.substring(0, 100) + "..."
-                    : ""}
+                  {book?.volumeInfo?.description?.substring(0, 100) + "..."}
                 </CardText>
-                <CardLink href={book.volumeInfo.previewLink} className="button">
+                <CardLink
+                  href={book?.volumeInfo?.previewLink}
+                  className="button"
+                >
                   View Details
                 </CardLink>
               </CardBody>
